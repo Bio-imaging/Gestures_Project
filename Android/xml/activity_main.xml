@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.bio.basictf.MainActivity">
+
+    <RelativeLayout
+        android:id="@+id/lay_one"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:orientation="horizontal"
+        tools:layout_editor_absoluteY="0dp"
+        tools:layout_editor_absoluteX="0dp"
+        android:layout_margin="10dp"
+        android:padding="5dp">
+        <LinearLayout
+            android:id="@+id/lyt_initial"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_margin="5dp"
+            android:layout_centerHorizontal="true">
+            <ToggleButton
+                android:textAlignment="center"
+                android:id="@+id/btn_mode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:textOff="Log Data"
+                android:textOn=" Online"
+                android:fontFamily="sans-serif-smallcaps"
+                />
+        </LinearLayout>
+        <TextView
+            android:textAlignment="center"
+            android:id="@+id/txtViewResult2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Hello World!"
+            android:textSize="50px"
+            tools:layout_editor_absoluteY="0dp"
+            android:layout_below="@id/lyt_initial"/>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/lay_two"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/lay_one"
+        android:orientation="horizontal"
+        tools:layout_editor_absoluteY="0dp"
+        tools:layout_editor_absoluteX="8dp"
+        android:layout_margin="5dp">
+        <Button
+            android:id="@+id/btn_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/lay_one"
+            android:text="Start" />
+
+        <Button
+            android:id="@+id/btn_stop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintLeft_toRightOf="@+id/btn_start"
+            android:text="Stop"
+            />
+
+        <Button
+            android:id="@+id/btn_reset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintLeft_toRightOf="@+id/btn_stop"
+            android:text="Reset"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/lay_three"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/lay_two"
+        android:orientation="horizontal"
+        tools:layout_editor_absoluteY="0dp"
+        tools:layout_editor_absoluteX="0dp"
+        android:layout_margin="5dp">
+        <TextView
+            android:id="@+id/txtViewResult"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hello World!"
+            android:textSize="50px"
+            tools:layout_editor_absoluteY="0dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/lay_four"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/lay_three"
+        android:orientation="horizontal"
+        tools:layout_editor_absoluteY="0dp"
+        tools:layout_editor_absoluteX="8dp"
+        android:layout_margin="5dp">
+        <Button
+            android:id="@+id/btn_Sensor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintLeft_toRightOf="@+id/btn_reset"
+            android:text="Real IMU Data"
+             />
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintLeft_toRightOf="@+id/btn_Sensor"
+            android:text="Simulated Data"/>
+    </LinearLayout>
+    <RelativeLayout
+        android:id="@+id/lay_five"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/lay_four"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:orientation="horizontal">
+        <Chronometer
+            android:id="@+id/lbl_crono"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="150px"
+            android:layout_centerHorizontal="true"
+            />
+        <ToggleButton
+            android:id="@+id/btn_toogle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="50px"
+            android:layout_margin="5dp"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/lbl_crono"
+            />
+        <Button
+            android:id="@+id/btn_exit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/btn_toogle"
+            android:layout_alignParentRight="true"
+            android:text="EXIT"/>
+    </RelativeLayout>
+</android.support.constraint.ConstraintLayout>

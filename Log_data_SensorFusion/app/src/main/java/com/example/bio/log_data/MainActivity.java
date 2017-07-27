@@ -217,12 +217,12 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 Log.i("Tensorflow", "Data size Gyr Y "+ input_Gyry.size());
                 Log.i("Tensorflow", "Data size Gyr Z "+ input_Gyrz.size());
                 String data_values = " ";
-                data_values += String.valueOf(input_Accx) + "\n";
-                data_values += String.valueOf(input_Accy) + "\n";
-                data_values += String.valueOf(input_Accz) + "\n";
-                data_values += String.valueOf(input_Gyrx) + "\n";
-                data_values += String.valueOf(input_Gyry) + "\n";
-                data_values += String.valueOf(input_Gyrz);
+                data_values += String.valueOf(input_Accx) + "\n"
+                            + String.valueOf(input_Accy)  + "\n"
+                            + String.valueOf(input_Accz)  + "\n"
+                            + String.valueOf(input_Gyrx)  + "\n"
+                            + String.valueOf(input_Gyry)  + "\n"
+                            + String.valueOf(input_Gyrz);
                 write(data_values);
                 try {
                     stream.close();

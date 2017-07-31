@@ -54,12 +54,12 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
     // Variables that are used during the program
     private String name_file = "mbientlab.csv";
-    private ArrayList<Float> input_Accx  = new ArrayList<>();
-    private ArrayList<Float> input_Accy  = new ArrayList<>();
-    private ArrayList<Float> input_Accz  = new ArrayList<>();
-    private ArrayList<Float> input_Gyrx  = new ArrayList<>();
-    private ArrayList<Float> input_Gyry  = new ArrayList<>();
-    private ArrayList<Float> input_Gyrz  = new ArrayList<>();
+    private ArrayList<String> input_Accx  = new ArrayList<>();
+    private ArrayList<String> input_Accy  = new ArrayList<>();
+    private ArrayList<String> input_Accz  = new ArrayList<>();
+    private ArrayList<String> input_Gyrx  = new ArrayList<>();
+    private ArrayList<String> input_Gyry  = new ArrayList<>();
+    private ArrayList<String> input_Gyrz  = new ArrayList<>();
 
     private File file;
     private FileOutputStream stream;
@@ -95,9 +95,9 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                         source.stream(new Subscriber() {
                             @Override
                             public void apply(Data data, Object... env) {
-                                input_Accx.add(data.value(CorrectedAcceleration.class).x());
-                                input_Accy.add(data.value(CorrectedAcceleration.class).y());
-                                input_Accz.add(data.value(CorrectedAcceleration.class).z());
+                                input_Accx.add(String.valueOf(data.value(CorrectedAcceleration.class).x()));
+                                input_Accy.add(String.valueOf(data.value(CorrectedAcceleration.class).y()));
+                                input_Accz.add(String.valueOf(data.value(CorrectedAcceleration.class).z()));
                             }
                         });
                     }
@@ -108,9 +108,9 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                         source.stream(new Subscriber() {
                             @Override
                             public void apply(Data data, Object... env) {
-                                input_Gyrx.add(data.value(CorrectedAngularVelocity.class).x());
-                                input_Gyry.add(data.value(CorrectedAngularVelocity.class).y());
-                                input_Gyrz.add(data.value(CorrectedAngularVelocity.class).z());
+                                input_Gyrx.add(String.valueOf(data.value(CorrectedAngularVelocity.class).x()));
+                                input_Gyry.add(String.valueOf(data.value(CorrectedAngularVelocity.class).y()));
+                                input_Gyrz.add(String.valueOf(data.value(CorrectedAngularVelocity.class).z()));
                             }
                         });
                     }
@@ -156,9 +156,15 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         }
     }
 
-    private void write(final String data) {
+    private void write(String accX, String accY, String accZ, String gyrX, String gyrY, String gyrZ) {
+        String line_space = "\n";
         try {
-            stream.write(data.getBytes());
+            stream.write(accX.getBytes());stream.write(line_space.getBytes());
+            stream.write(accY.getBytes());stream.write(line_space.getBytes());
+            stream.write(accZ.getBytes());stream.write(line_space.getBytes());
+            stream.write(gyrX.getBytes());stream.write(line_space.getBytes());
+            stream.write(gyrY.getBytes());stream.write(line_space.getBytes());
+            stream.write(gyrZ.getBytes());stream.write(line_space.getBytes());
             Log.i("Tensorflow","Stream saving data");
         } catch (Exception e) {
             e.printStackTrace();
@@ -216,14 +222,17 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 Log.i("Tensorflow", "Data size Gyr X "+ input_Gyrx.size());
                 Log.i("Tensorflow", "Data size Gyr Y "+ input_Gyry.size());
                 Log.i("Tensorflow", "Data size Gyr Z "+ input_Gyrz.size());
-                String data_values = " ";
-                data_values += String.valueOf(input_Accx) + "\n";
-                data_values += String.valueOf(input_Accy) + "\n";
-                data_values += String.valueOf(input_Accz) + "\n";
-                data_values += String.valueOf(input_Gyrx) + "\n";
-                data_values += String.valueOf(input_Gyry) + "\n";
-                data_values += String.valueOf(input_Gyrz);
-                write(data_values);
+
+                write(input_Accx.toString(), input_Accy.toString(), input_Accz.toString(),
+                        input_Gyrx.toString(), input_Gyry.toString(),input_Gyrz.toString());
+
+                input_Accx.clear();
+                input_Accy.clear();
+                input_Accz.clear();
+                input_Gyrx.clear();
+                input_Gyry.clear();
+                input_Gyrz.clear();
+
                 try {
                     stream.close();
                 } catch (IOException e) {

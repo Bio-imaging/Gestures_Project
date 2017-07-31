@@ -1,0 +1,62 @@
+gyroscope.angularVelocity().addRouteAsync(new RouteBuilder() {
+                    @Override
+                    public void configure(final RouteComponent source) {
+                        source.multicast()
+                                .to().stream(new Subscriber() {
+                            @Override
+                            public void apply(Data data, Object... env) {
+                                    Log.i("Tensorflow",data.value(AngularVelocity.class).toString());
+//                                gyro_val = data.value(AngularVelocity.class);
+//                                input_Gyrx.add(gyro_val.x());
+//                                input_Gyry.add(gyro_val.y());
+//                                input_Gyrz.add(gyro_val.z());
+//                                if(input_Gyrx.size() == 151 ){
+//                                    input_Gyrx.remove(1);
+//                                    input_Gyry.remove(1);
+//                                    input_Gyrz.remove(1);
+//                                }
+                            }
+                        })
+                                .to().map(Function1.RMS)
+                                .average((byte) 6)
+                                .filter(Comparison.GTE,0.4f)
+                                .stream(new Subscriber() {
+                                    @Override
+                                    public void apply(Data data, Object... env) {
+                                        Log.i("Tensorflow",data.value(AngularVelocity.class).toString());
+                                        Log.i("Tensorflow",String.format("Gyro Activity"));
+                                        GyrOk = true;
+                                        input_sma.add(gyroscope.packedAngularVelocity());
+                                    }
+                                }).delay((byte) 4);
+                    }
+                });
+
+                accelerometer.acceleration().addRouteAsync(new RouteBuilder() {
+                    public void configure(RouteComponent source) {
+                        source.multicast()
+                                .to().stream(new Subscriber() {
+                            @Override
+                            public void apply(Data data, Object... env) {
+                                acc_val = data.value(Acceleration.class);
+                                input_Accx.add(acc_val.x());
+                                input_Accy.add(acc_val.y());
+                                input_Accz.add(acc_val.z());
+                                if(input_Accx.size() == 151 ) {
+                                    input_Accx.remove(1);
+                                    input_Accy.remove(1);
+                                    input_Accz.remove(1);
+                                }
+                            }
+                        })
+                                .to().map(Function1.RMS).average((byte) 6)
+                                .filter(Comparison.GTE,0.6f)
+                                .stream(new Subscriber() {
+                                    @Override
+                                    public void apply(Data data, Object... env) {
+                                        Log.i("Tensorflow",String.format("Acc Activity"));
+                                        AccOk = true;
+                                    }
+                                }).delay((byte) 4);
+                    }
+                });

@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.Chronometer;
 import android.widget.TextView;
 import android.content.*;
@@ -21,6 +22,8 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 import android.os.Handler;
 
+import com.github.johnpersano.supertoasts.library.Style;
+import com.github.johnpersano.supertoasts.library.SuperToast;
 import com.mbientlab.metawear.Data;
 import com.mbientlab.metawear.MetaWearBoard;
 import com.mbientlab.metawear.Route;
@@ -37,9 +40,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 
 import bolts.Continuation;
 import bolts.Task;
+import com.github.johnpersano.supertoasts.library.SuperActivityToast;
 
 public class MainActivity extends AppCompatActivity implements ServiceConnection{
 
@@ -107,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                                 input_Accx.add(data.value(CorrectedAcceleration.class).x());
                                 input_Accy.add((float) (data.value(CorrectedAcceleration.class).y() - 1.0));
                                 input_Accz.add(data.value(CorrectedAcceleration.class).z());
-                                if(input_Accx.size() > 80){
+                                if(input_Accx.size() > 100){
                                     input_Accx.remove(0);
                                     input_Accy.remove(0);
                                     input_Accz.remove(0);
@@ -125,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                                 input_Gyrx.add(data.value(CorrectedAngularVelocity.class).y());
                                 input_Gyry.add(data.value(CorrectedAngularVelocity.class).x());
                                 input_Gyrz.add(data.value(CorrectedAngularVelocity.class).z());
-                                if(input_Gyrx.size() > 80){
+                                if(input_Gyrx.size() > 100){
                                     input_Gyrx.remove(0);
                                     input_Gyry.remove(0);
                                     input_Gyrz.remove(0);
@@ -170,14 +175,12 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         final TextView textViewR2 = (TextView) findViewById(R.id.txtViewResult2);
         String newline = System.lineSeparator();
         String newsep = "       ";
-        String mostrar =  " Hor : " + String.valueOf(inference[0]) + newsep
-                        + " Ver : " + String.valueOf(inference[1]) + newline
-                        + " Phor: " + String.valueOf(inference[2]) + newsep
-                        + " PVer: " + String.valueOf(inference[3]) + newline
-                        + " V_S : " + String.valueOf(inference[4]) + newsep
-                        + " X_S : " + String.valueOf(inference[5]) + newline
-                        + " C_V : " + String.valueOf(inference[6]) + newsep
-                        + " C_H : " + String.valueOf(inference[7]);
+        String mostrar =  " Poke H: " + String.valueOf(inference[2]) + newline
+                        + " Poke V: " + String.valueOf(inference[3]) + newline
+                        + " Shape V : " + String.valueOf(inference[4]) + newline
+                        + " Shape X : " + String.valueOf(inference[5]) + newline
+                        + " Circle C : " + String.valueOf(inference[6]) + newline
+                        + " Circle CC : " + String.valueOf(inference[7]);
         textViewR2.setText(mostrar);
 
         final TextView textView_soft = (TextView) findViewById(R.id.txtViewResult);
@@ -197,11 +200,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     private void InitializeVariables(){
         for (int i = 0; i < relations.length; i++) {
             relations[i] = (float) (Math.random()*0.001);
-            if (i%2 ==0){relations[i] = (float) ((float) Math.random()*0.0001);}
-        }
-        for (int i = 0; i < relations_val.length; i++) {
-            relations_val[i] = (float) (Math.random()*0.0001);
-            if (i%2 ==0){relations_val[i] = (float) (Math.random()*0.0001);}
+            relations_val[i] = (float) (Math.random()*0.001);
         }
         try {
             file = new File(Environment.getExternalStorageDirectory(), name_file);
@@ -216,17 +215,11 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         String char_space = ",";
         String char_tab   = "\t";
         try {
-            stream.write(accX.getBytes());stream.write(line_space.getBytes());
-            stream.write(accY.getBytes());stream.write(line_space.getBytes());
-            stream.write(accZ.getBytes());stream.write(line_space.getBytes());
-            stream.write(gyrX.getBytes());stream.write(line_space.getBytes());
-            stream.write(gyrY.getBytes());stream.write(line_space.getBytes());
-            stream.write(gyrZ.getBytes());stream.write(line_space.getBytes());
-            for(int idx= 0;idx<150;idx++){
-                stream.write(String.valueOf(allVector[idx]).getBytes());stream.write(char_space.getBytes());
+            for(int act=0;act<6;act++){
+                for(int idx= 0+150*act;idx<150*(act+1);idx++){
+                    stream.write(String.valueOf(allVector[idx]).getBytes());stream.write(char_space.getBytes());
+                }stream.write(line_space.getBytes());
             }
-            stream.write(line_space.getBytes());
-
             Log.i("Tensorflow","Stream saving data");
         } catch (Exception e) {
             e.printStackTrace();
@@ -249,13 +242,18 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
         verifyStoragePermissions(MainActivity.this);
         crono = (Chronometer) findViewById(R.id.lbl_crono);
         toggle_m = (ToggleButton) findViewById(R.id.btn_toogle);
         final Model_Functions model = new Model_Functions();
         final Model_Tensorflow tensorflow = new Model_Tensorflow();
+        long t1 =  new Date().getTime();
         tensorflow.Load_Tensorflow(this.getApplicationContext());
+        long t2 = new Date().getTime();
+        long t3 =  t2 - t1;
+        Log.i("Tensorflow", "time loading model" + String.valueOf(t3));
 
         InitializeVariables();
         ///< Bind the service when the activity is created
@@ -282,6 +280,15 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 input_Gyrz.clear();
 
 
+                SuperActivityToast.create(view.getContext(),new Style(), Style.ANIMATIONS_FADE)
+                        .setText("Loading")
+                        .setTextSize(25)
+                        .setIconPosition(Style.ICONPOSITION_BOTTOM)
+                        .setIconResource(R.drawable.home_bio)
+                        .setDuration(Style.DURATION_SHORT)
+                        .setFrame(Style.FRAME_KITKAT)
+                        .show();
+
                 new Thread(){
                     public void run(){
                         Log.i("Tensorflow","Activated Online mode");
@@ -291,14 +298,18 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                                 if(Inicio == 0){
                                     sleep(2000);
                                     Inicio = 1;
+
                                 }
                                 sleep(100);
+                                long start_time =  new Date().getTime();
+
                                 float averageAcc = model.calculateAverage(input_Accx,input_Accy,input_Accz,1);
                                 float averageGyr = model.calculateAverage(input_Gyrx,input_Gyry,input_Gyrz,2);
                                 Log.i("Tensorflow","Average Acc = " + averageAcc);
                                 Log.i("Tensorflow","Average Gyr = " + averageGyr);
 
                                 if(averageAcc > 0.2f && averageGyr > 0.2f) {
+                                    long threshold_time =  new Date().getTime();
                                     Log.i("Tensorflow", "Action");
                                     handler.post(new Runnable() {
                                         @Override
@@ -307,7 +318,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                                             toggle_m.setBackgroundColor(Color.BLUE);
                                         }
                                     });
-                                    sleep(500);
+                                    sleep(800);
+                                    long get_data_time =  new Date().getTime();
                                     ArrayList<Float> input_Accx2 = new ArrayList(model.calculateNormalize(input_Accx,1,0));
                                     ArrayList<Float> input_Accy2 = new ArrayList(model.calculateNormalize(input_Accy,1,0));
                                     ArrayList<Float> input_Accz2 = new ArrayList(model.calculateNormalize(input_Accz,1,0));
@@ -328,13 +340,26 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                                         relations_val[shift2+(num_data*5)+i] = input_Gyrz2.get(i);
                                     }
 
-                                    write(input_Accx2.toString(), input_Accy2.toString(), input_Accz2.toString(),
-                                            input_Gyrx2.toString(), input_Gyry2.toString(),input_Gyrz2.toString(),relations_val);
-
+                                    long posting_time =  new Date().getTime();
                                     handler.post(new Runnable() {
                                         @Override
-                                        public void run() {show_results(tensorflow.TensorflowModel(relations_val));}
+                                        public void run() {
+                                            show_results(tensorflow.TensorflowModel(relations_val));
+                                        }
                                     });
+                                    long writing_time =  new Date().getTime();
+                                    write(input_Accx2.toString(), input_Accy2.toString(), input_Accz2.toString(),
+                                            input_Gyrx2.toString(), input_Gyry2.toString(),input_Gyrz2.toString(),relations_val);
+                                    long final_time =  new Date().getTime();
+
+                                    Log.i("Tensorflow","From start to end = "+ String.valueOf(final_time-start_time));
+                                    Log.i("Tensorflow","From start to detect th = "+ String.valueOf(threshold_time-start_time));
+                                    Log.i("Tensorflow","From th to detect data = "+ String.valueOf(get_data_time-threshold_time));
+                                    Log.i("Tensorflow","From data to post (pross) = "+ String.valueOf(posting_time-get_data_time));
+                                    Log.i("Tensorflow","From post to write = "+ String.valueOf(writing_time-posting_time));
+                                    Log.i("Tensorflow","From write to end  = "+ String.valueOf(final_time-writing_time));
+
+
                                     sleep(500);
 
                                 }else{
@@ -391,7 +416,11 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // this is simulated data
+                long tf_t1 =  new Date().getTime();
                 show_results(tensorflow.TensorflowModel(relations));
+                long tf_t2 = new Date().getTime();
+                long tf_t3 =  tf_t2 - tf_t1;
+                Log.i("Tensorflow", "time to show model result " + String.valueOf(tf_t3));
             }
         });
 
@@ -399,7 +428,11 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             @Override
             public void onClick(View view) {
                 // this is real data
+                long tf_t1 =  new Date().getTime();
                 show_results(tensorflow.TensorflowModel(relations_val));
+                long tf_t2 = new Date().getTime();
+                long tf_t3 =  tf_t2 - tf_t1;
+                Log.i("Tensorflow", "time to show model result " + String.valueOf(tf_t3));
             }
         });
 
